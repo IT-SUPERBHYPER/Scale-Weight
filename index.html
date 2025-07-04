@@ -70,13 +70,6 @@
       display: inline-block;
     }
     .del-btn:active, .del-btn:focus { background: #a6231f; }
-    .swipe-row { position: relative; user-select:none; touch-action:pan-y; transition: background 0.14s;}
-    .swipe-row .swipe-content { transition: transform 0.2s; }
-    .swipe-row .swipe-delete {
-      position: absolute; top: 0; right: 0; height: 100%; display: flex; align-items: center; justify-content: flex-end;
-      padding-right: 12px; z-index: 10;
-    }
-    .swiped { background: #fff0f0; }
     @media (max-width:700px) {
       form, .table-container { max-width: 100vw; }
       h1 { font-size: 1.19em;}
@@ -193,64 +186,21 @@
       const data = filtered || results;
       const tbody = document.querySelector('#resultsTable tbody');
       tbody.innerHTML = data.map((r, idx) => `
-        <tr class="swipe-row" data-idx="${idx}" ontouchstart="swipeStart(event,${idx},${!!filtered})" ontouchmove="swipeMove(event,${idx},${!!filtered})" ontouchend="swipeEnd(event,${idx},${!!filtered})">
-          <td class="swipe-content">${r.date}</td>
-          <td class="swipe-content">${r.scaleModel}</td>
-          <td class="swipe-content">${r.location}</td>
-          <td class="swipe-content">${r.weight.toFixed(2)}</td>
-          <td class="swipe-content">${r.diff > 0 ? "+" : ""}${r.diff.toFixed(2)} kg</td>
-          <td class="swipe-content ${r.status === 'OK' ? 'okay' : 'flag'}">${r.status}</td>
-          <td class="swipe-content">${r.notes}</td>
-          <td style="position:relative;">
-            <span class="swipe-delete" style="display:none;">
-              <button class="del-btn" onclick="deleteEntry(${idx}, ${!!filtered})">Delete</button>
-            </span>
-            <button class="del-btn" onclick="deleteEntry(${idx}, ${!!filtered})" style="display:none;">Delete</button>
+        <tr>
+          <td>${r.date}</td>
+          <td>${r.scaleModel}</td>
+          <td>${r.location}</td>
+          <td>${r.weight.toFixed(2)}</td>
+          <td>${r.diff > 0 ? "+" : ""}${r.diff.toFixed(2)} kg</td>
+          <td class="${r.status === 'OK' ? 'okay' : 'flag'}">${r.status}</td>
+          <td>${r.notes}</td>
+          <td>
+            <button class="del-btn" onclick="deleteEntry(${idx}, ${!!filtered})">Delete</button>
           </td>
         </tr>
       `).join('');
-      // Reset swipe status
-      swipeData = {};
     }
 
-    // --- SWIPE TO DELETE LOGIC (Mobile Only) ---
-    let swipeData = {};
-
-    window.swipeStart = function(e, idx, isFiltered) {
-      if (e.touches && e.touches.length === 1) {
-        swipeData[idx] = {
-          startX: e.touches[0].clientX,
-          moved: false,
-          elem: e.target.closest('tr')
-        };
-      }
-    };
-    window.swipeMove = function(e, idx, isFiltered) {
-      if (e.touches && e.touches.length === 1 && swipeData[idx]) {
-        let deltaX = e.touches[0].clientX - swipeData[idx].startX;
-        if (Math.abs(deltaX) > 40) {
-          swipeData[idx].moved = true;
-          let row = swipeData[idx].elem;
-          row.classList.add('swiped');
-          // Hide all other delete buttons
-          document.querySelectorAll('.swipe-delete').forEach(d => d.style.display = 'none');
-          row.querySelector('.swipe-delete').style.display = 'flex';
-        }
-      }
-    };
-    window.swipeEnd = function(e, idx, isFiltered) {
-      if (swipeData[idx] && swipeData[idx].moved) {
-        // Do nothing, Delete button already shown
-      } else if (swipeData[idx]) {
-        // Tap or vertical scroll, hide any open delete
-        document.querySelectorAll('.swipe-delete').forEach(d => d.style.display = 'none');
-        let row = swipeData[idx].elem;
-        row.classList.remove('swiped');
-      }
-      swipeData[idx] = null;
-    };
-
-    // Delete handler (works for both tap/click and swipe)
     window.deleteEntry = function(idx, isFiltered) {
       let data = filteredResults || results;
       if (isFiltered) {
@@ -272,11 +222,6 @@
         renderTable();
       }
       saveResults();
-      // Hide all open delete buttons
-      setTimeout(() => {
-        document.querySelectorAll('.swipe-delete').forEach(d => d.style.display = 'none');
-        document.querySelectorAll('.swipe-row').forEach(r => r.classList.remove('swiped'));
-      }, 200);
     };
 
     function downloadCSV() {
