@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scale Calibration Checker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="manifest" href="manifest.json">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <meta name="theme-color" content="#2870ea"/>
+  <style>
+    html, body { height: 100%; }
+    body { 
+      font-family: 'Segoe UI', Arial, sans-serif; 
+      background: #f7fafd; 
+      padding: 12px;
+      margin: 0;
+      min-height: 100vh;
+    }
+    h1 { color: #124e89; font-size: 1.6em; margin-bottom: 8px;}
+    form { 
+      background: #fff; 
+      border-radius: 10px; 
+      box-shadow: 0 4px 16px #0001; 
+      padding: 18px 12px; 
+      margin-bottom: 18px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    label { font-weight: 600; display: block; margin-bottom: 3px; }
+    select, input[type="number"], input[type="text"] {
+      padding: 12px; margin-bottom: 10px;
+      border: 1px solid #ccd; border-radius: 7px;
+      font-size: 1.12em; width: 100%; box-sizing: border-box;
+      background: #f8fafc;
+    }
+    button[type="submit"], .export-btns button {
+      background: #2870ea; color: #fff; border: none; border-radius: 7px;
+      padding: 14px 0; font-size: 1.09em; width: 100%; margin-top: 8px; margin-bottom: 4px;
+      cursor: pointer; box-shadow: 0 2px 4px #0001; transition: background 0.16s;
+    }
+    button[type="submit"]:active, .export-btns button:active { background: #1557c0; }
+    .export-btns {
+      display: flex; gap: 12px; margin-bottom: 14px; justify-content: center; flex-wrap: wrap;
+    }
+    .export-btns button { width: 140px; min-width: 110px; padding: 12px 0; margin-bottom: 0; }
+    #saveStatus {margin-left:8px; font-size:13px;}
+    .search-bar { margin-bottom: 14px; text-align: center; }
+    .search-bar input {
+      padding: 12px; border: 1px solid #ccd; border-radius: 7px;
+      width: 100%; max-width: 340px; font-size: 1.08em; background: #f8fafc;
+    }
+    .table-container { width: 100%; overflow-x: auto; margin: 0 auto; background: #fff;
+      border-radius: 10px; box-shadow: 0 2px 10px #0002; padding: 0;
+    }
+    table {
+      width: 100%; min-width: 780px; border-radius: 8px; border-collapse: collapse;
+      font-size: 1em; background: #fff;
+    }
+    th, td { padding: 12px 6px; border-bottom: 1px solid #eee; text-align: left; }
+    th {
+      background: #f0f6fb; position: sticky; top: 0; z-index: 1; font-size: 1em;
+    }
+    .flag { color: #e74c3c; font-weight: bold;}
+    .okay { color: #23c181; font-weight: bold;}
+    .del-btn {
+      background: #e74c3c; color: #fff; border: none; border-radius: 5px;
+      padding: 9px 14px; cursor: pointer; font-size: 1em; width: 100%; max-width: 82px;
+      box-shadow: 0 1px 3px #0002; opacity: 1; transition: background 0.18s, opacity .2s;
+      display: inline-block;
+    }
+    .del-btn:active, .del-btn:focus { background: #a6231f; }
+    .swipe-row { position: relative; user-select:none; touch-action:pan-y; transition: background 0.14s;}
+    .swipe-row .swipe-content { transition: transform 0.2s; }
+    .swipe-row .swipe-delete {
+      position: absolute; top: 0; right: 0; height: 100%; display: flex; align-items: center; justify-content: flex-end;
+      padding-right: 12px; z-index: 10;
+    }
+    .swiped { background: #fff0f0; }
+    @media (max-width:700px) {
+      form, .table-container { max-width: 100vw; }
+      h1 { font-size: 1.19em;}
+      table { font-size: .96em; min-width: 620px;}
+      .export-btns button { font-size: 1em; min-width: 90px;}
+    }
+    @media (max-width:480px) {
+      body { padding: 3px;}
+      .table-container { box-shadow: none;}
+      table { font-size: .95em; min-width: 500px;}
+      th, td { padding: 9px 2px;}
+    }
+  </style>
+</head>
+<body>
+  <h1>Scale Calibration Checker</h1>
+  <form id="scaleForm" autocomplete="off">
+    <label>Scale Model:
+      <select id="scaleModel" required>
+        <option value="">Select Scale</option>
+        <option>DS782</option>
+        <option>SM110</option>
+        <option>MICRO A12E 300KG</option>
+        <option>MICRO A12E 30KG</option>
+        <option>MICRO A12E 600KG</option>
+        <option>PALLET SCALE</option>
+        <option>COIN SCALE</option>
+      </select>
+    </label>
+    <label>Location:
+      <select id="location" required>
+        <option value="">Select Location</option>
+        <optgroup label="Tills" id="tillsGroup"></optgroup>
+        <optgroup label="Departments">
+          <option>BUTCHERY</option>
+          <option>SPICE</option>
+          <option>CHEESE</option>
+          <option>FRUIT AND VEG</option>
+          <option>RECEIVING</option>
+          <option>CASH OFFICE</option>
+          <option>SILVERS</option>
+        </optgroup>
+      </select>
+    </label>
+    <label>Measured Weight (kg): 
+      <input type="number" id="weight" step="0.01" required>
+    </label>
+    <label>Notes (optional): <input type="text" id="notes"></label>
+    <button type="submit">Add Reading</button>
+  </form>
+  <div class="export-btns">
+    <button onclick="downloadCSV()" type="button">Download CSV</button>
+    <button onclick="downloadPDF()" type="button">Download PDF</button>
+    <span id="saveStatus"></span>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search results...">
+  </div>
+  <div class="table-container">
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Scale Model</th>
+          <th>Location</th>
+          <th>Measured (kg)</th>
+          <th>Difference</th>
+          <th>Status</th>
+          <th>Notes</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- results here -->
+      </tbody>
+    </table>
+  </div>
+  <script>
+    // ==== BIN ID AND SECRET KEY ====
+    const BIN_ID = '686798f38a456b7966bb2a98';
+    const SECRET_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
+    // ===============================
+
+    window.onload = function() {
+      let tillOptions = '';
+      for (let i = 1; i <= 80; i++) {
+        tillOptions += `<option>TILL ${i}</option>`;
+      }
+      document.getElementById('tillsGroup').innerHTML = tillOptions;
+      loadResults();
+    }
+
+    const tolerance = 0.05;
+    let results = [];
+    let filteredResults = null;
+
+    document.getElementById('scaleForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const scaleModel = document.getElementById('scaleModel').value;
+      const location = document.getElementById('location').value;
+      const weight = parseFloat(document.getElementById('weight').value);
+      const notes = document.getElementById('notes').value.trim();
+      const diff = +(weight - 5).toFixed(2);
+      const status = Math.abs(diff) <= tolerance ? "OK" : "NEEDS CALIBRATION";
+      const date = new Date().toLocaleString();
+      results.push({ date, scaleModel, location, weight, diff, status, notes });
+      renderTable();
+      saveResults();
+      this.reset();
+      document.getElementById('scaleModel').focus();
+    });
+
+    function renderTable(filtered = null) {
+      const data = filtered || results;
+      const tbody = document.querySelector('#resultsTable tbody');
+      tbody.innerHTML = data.map((r, idx) => `
+        <tr class="swipe-row" data-idx="${idx}" ontouchstart="swipeStart(event,${idx},${!!filtered})" ontouchmove="swipeMove(event,${idx},${!!filtered})" ontouchend="swipeEnd(event,${idx},${!!filtered})">
+          <td class="swipe-content">${r.date}</td>
+          <td class="swipe-content">${r.scaleModel}</td>
+          <td class="swipe-content">${r.location}</td>
+          <td class="swipe-content">${r.weight.toFixed(2)}</td>
+          <td class="swipe-content">${r.diff > 0 ? "+" : ""}${r.diff.toFixed(2)} kg</td>
+          <td class="swipe-content ${r.status === 'OK' ? 'okay' : 'flag'}">${r.status}</td>
+          <td class="swipe-content">${r.notes}</td>
+          <td style="position:relative;">
+            <span class="swipe-delete" style="display:none;">
+              <button class="del-btn" onclick="deleteEntry(${idx}, ${!!filtered})">Delete</button>
+            </span>
+            <button class="del-btn" onclick="deleteEntry(${idx}, ${!!filtered})" style="display:none;">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+      // Reset swipe status
+      swipeData = {};
+    }
+
+    // --- SWIPE TO DELETE LOGIC (Mobile Only) ---
+    let swipeData = {};
+
+    window.swipeStart = function(e, idx, isFiltered) {
+      if (e.touches && e.touches.length === 1) {
+        swipeData[idx] = {
+          startX: e.touches[0].clientX,
+          moved: false,
+          elem: e.target.closest('tr')
+        };
+      }
+    };
+    window.swipeMove = function(e, idx, isFiltered) {
+      if (e.touches && e.touches.length === 1 && swipeData[idx]) {
+        let deltaX = e.touches[0].clientX - swipeData[idx].startX;
+        if (Math.abs(deltaX) > 40) {
+          swipeData[idx].moved = true;
+          let row = swipeData[idx].elem;
+          row.classList.add('swiped');
+          // Hide all other delete buttons
+          document.querySelectorAll('.swipe-delete').forEach(d => d.style.display = 'none');
+          row.querySelector('.swipe-delete').style.display = 'flex';
+        }
+      }
+    };
+    window.swipeEnd = function(e, idx, isFiltered) {
+      if (swipeData[idx] && swipeData[idx].moved) {
+        // Do nothing, Delete button already shown
+      } else if (swipeData[idx]) {
+        // Tap or vertical scroll, hide any open delete
+        document.querySelectorAll('.swipe-delete').forEach(d => d.style.display = 'none');
+        let row = swipeData[idx].elem;
+        row.classList.remove('swiped');
+      }
+      swipeData[idx] = null;
+    };
+
+    // Delete handler (works for both tap/click and swipe)
+    window.deleteEntry = function(idx, isFiltered) {
+      let data = filteredResults || results;
+      if (isFiltered) {
+        const row = data[idx];
+        const mainIdx = results.findIndex(
+          r => r.date === row.date &&
+               r.scaleModel === row.scaleModel &&
+               r.location === row.location &&
+               r.weight === row.weight &&
+               r.diff === row.diff &&
+               r.status === row.status &&
+               r.notes === row.notes
+        );
+        if (mainIdx > -1) results.splice(mainIdx, 1);
+        data.splice(idx, 1);
+        renderTable(data);
+      } else {
+        results.splice(idx, 1);
+        renderTable();
+      }
+      saveResults();
+      // Hide all open delete buttons
+      setTimeout(() => {
+        document.querySelectorAll('.swipe-delete').forEach(d => d.style.display = 'none');
+        document.querySelectorAll('.swipe-row').forEach(r => r.classList.remove('swiped'));
+      }, 200);
+    };
+
+    function downloadCSV() {
+      if (!results.length) return alert('No data to download!');
+      let csv = 'Date,Scale Model,Location,Measured (kg),Difference,Status,Notes\n';
+      csv += results.map(r =>
+        `"${r.date}","${r.scaleModel}","${r.location}",${r.weight.toFixed(2)},"${r.diff > 0 ? "+" : ""}${r.diff.toFixed(2)} kg",${r.status},"${r.notes.replace(/"/g,'""')}"`
+      ).join('\n');
+      const blob = new Blob([csv], {type: 'text/csv'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'scale_calibration.csv';
+      a.click();
+    }
+
+    function downloadPDF() {
+      if (!results.length) return alert('No data to download!');
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const col = ["Date", "Scale Model", "Location", "Measured (kg)", "Difference", "Status", "Notes"];
+      const rows = results.map(r => [
+        r.date,
+        r.scaleModel,
+        r.location,
+        r.weight.toFixed(2),
+        (r.diff > 0 ? "+" : "") + r.diff.toFixed(2) + " kg",
+        r.status,
+        r.notes
+      ]);
+      doc.setFontSize(16);
+      doc.text("Scale Calibration Report", 10, 15);
+      doc.setFontSize(10);
+      let startY = 25;
+      const rowHeight = 8;
+      col.forEach((c, i) => {
+        doc.text(c, 10 + i*30, startY);
+      });
+      rows.forEach((row, rIdx) => {
+        row.forEach((cell, cIdx) => {
+          doc.text(String(cell), 10 + cIdx*30, startY + rowHeight * (rIdx + 1));
+        });
+      });
+      doc.save('scale_calibration.pdf');
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const value = this.value.trim().toLowerCase();
+      if (!value) {
+        filteredResults = null;
+        renderTable();
+        return;
+      }
+      filteredResults = results.filter(r =>
+        Object.values(r).some(val =>
+          String(val).toLowerCase().includes(value)
+        )
+      );
+      renderTable(filteredResults);
+    });
+
+    async function loadResults() {
+      setStatus('Loading data...');
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+          headers: {
+            'X-Master-Key': SECRET_KEY
+          }
+        });
+        if (!res.ok) throw new Error('Error loading data');
+        const data = await res.json();
+        if (data.record && Array.isArray(data.record)) {
+          results = data.record;
+        } else if (data.record && Array.isArray(data.record.results)) {
+          results = data.record.results;
+        } else {
+          results = [];
+        }
+        renderTable();
+        setStatus('Loaded!');
+      } catch (err) {
+        setStatus('Failed to load data');
+      }
+    }
+
+    async function saveResults() {
+      setStatus('Saving...');
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': SECRET_KEY
+          },
+          body: JSON.stringify(results)
+        });
+        if (!res.ok) throw new Error('Failed to save');
+        setStatus('Saved!');
+      } catch (err) {
+        setStatus('Failed to save');
+      }
+    }
+
+    function setStatus(msg) {
+      document.getElementById('saveStatus').textContent = msg;
+      if(msg!=="") setTimeout(()=>{document.getElementById('saveStatus').textContent="";},2500);
+    }
+
+    renderTable();
+
+    // PWA Install (Service Worker)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+      .then(() => { /* success */ })
+      .catch(() => { /* fail silently */ });
+    }
+  </script>
+</body>
+</html>
