@@ -2,144 +2,419 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Scale Calibration Checker</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>⚡SCALE CAL: CYBERPUNK⚡</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
   <link rel="manifest" href="manifest.json">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <meta name="theme-color" content="#2870ea"/>
+  <meta name="theme-color" content="#00f0ff"/>
   <style>
-    html, body { height: 100%; }
-    body { 
-      font-family: 'Segoe UI', Arial, sans-serif; 
-      background: #f7fafd; 
-      padding: 12px;
-      margin: 0;
-      min-height: 100vh;
+    /* CYBERPUNK THEME - MOBILE FIRST */
+    * {
+      box-sizing: border-box;
     }
-    h1 { color: #124e89; font-size: 1.6em; margin-bottom: 8px;}
-    form { 
-      background: #fff; 
-      border-radius: 10px; 
-      box-shadow: 0 4px 16px #0001; 
-      padding: 18px 12px; 
-      margin-bottom: 18px;
-      max-width: 480px;
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Rajdhani', 'Segoe UI', 'Arial', sans-serif;
+      background: #0a0c0f;
+      background-image: 
+        linear-gradient(45deg, rgba(255, 0, 255, 0.05) 0%, transparent 20%),
+        linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 50% 50%, #1a1f2e 0%, #0b0d14 100%);
+      color: #e0e0ff;
+      padding: 8px;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Glitch effect overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(0deg, rgba(0,255,255,0.02) 0px, rgba(255,0,255,0.02) 2px, transparent 3px, transparent 6px);
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    h1 {
+      color: #00f0ff;
+      font-size: 1.8em;
+      margin: 10px 0 12px 0;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      text-shadow: 
+        0 0 5px #00f0ff,
+        0 0 10px #00f0ff,
+        2px 2px 0 #ff00ff,
+        -2px -2px 0 #00ffff;
+      font-weight: 700;
+      word-break: break-word;
+      animation: glitch 3s infinite;
+    }
+
+    @keyframes glitch {
+      0%, 100% { transform: skew(0deg, 0deg); opacity: 1; }
+      95% { transform: skew(0deg, 0deg); opacity: 1; }
+      96% { transform: skew(5deg, 1deg); opacity: 0.8; text-shadow: 3px 0 0 #ff00ff, -3px 0 0 #00ffff; }
+      97% { transform: skew(-5deg, -1deg); opacity: 0.9; text-shadow: -3px 0 0 #ff00ff, 3px 0 0 #00ffff; }
+      98% { transform: skew(0deg, 0deg); opacity: 1; }
+    }
+
+    form, .table-container, .export-btns, .search-bar input {
+      border: 2px solid #00f0ff;
+      box-shadow: 
+        0 0 15px #00f0ff,
+        inset 0 0 10px rgba(0, 240, 255, 0.3),
+        5px 5px 0 #ff00ff;
+      background: #0f1119;
+      backdrop-filter: blur(2px);
+    }
+
+    form {
+      border-radius: 16px;
+      padding: 20px 16px;
+      margin-bottom: 20px;
+      max-width: 100%;
       margin-left: auto;
       margin-right: auto;
+      background: rgba(10, 15, 25, 0.95);
     }
-    label { font-weight: 600; display: block; margin-bottom: 3px; }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 6px;
+      color: #ffb3ff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.9em;
+      text-shadow: 0 0 5px #ff00ff;
+    }
+
     select, input[type="number"], input[type="text"] {
-      padding: 12px; margin-bottom: 10px;
-      border: 1px solid #ccd; border-radius: 7px;
-      font-size: 1.12em; width: 100%; box-sizing: border-box;
-      background: #f8fafc;
+      padding: 16px 14px;
+      margin-bottom: 18px;
+      border: 2px solid #4a3f7a;
+      border-radius: 12px;
+      font-size: 1.18em;
+      width: 100%;
+      box-sizing: border-box;
+      background: #0b0e14;
+      color: #00ffff;
+      font-weight: 500;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: all 0.2s;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
     }
+
+    select:focus, input:focus {
+      border-color: #ff00ff;
+      outline: none;
+      box-shadow: 0 0 15px #ff00ff, inset 0 0 10px #000;
+    }
+
+    /* Custom dropdown arrow */
+    select {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2300f0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 20px;
+    }
+
     button[type="submit"], .export-btns button {
-      background: #2870ea; color: #fff; border: none; border-radius: 7px;
-      padding: 14px 0; font-size: 1.09em; width: 100%; margin-top: 8px; margin-bottom: 4px;
-      cursor: pointer; box-shadow: 0 2px 4px #0001; transition: background 0.16s;
+      background: #120b29;
+      color: #00f0ff;
+      border: 2px solid #ff00ff;
+      border-radius: 40px;
+      padding: 18px 0;
+      font-size: 1.3em;
+      width: 100%;
+      margin-top: 10px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 
+        0 0 20px #ff00ff,
+        inset 0 0 10px #00f0ff;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
     }
-    button[type="submit"]:active, .export-btns button:active { background: #1557c0; }
+
+    button[type="submit"]:active, .export-btns button:active {
+      background: #1f1440;
+      transform: scale(0.98);
+      box-shadow: 0 0 30px #00f0ff, inset 0 0 20px #ff00ff;
+    }
+
     .export-btns {
-      display: flex; gap: 12px; margin-bottom: 14px; justify-content: center; flex-wrap: wrap;
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 16px;
+      border-radius: 50px;
+      background: rgba(10, 15, 25, 0.9);
     }
-    .export-btns button { width: 140px; min-width: 110px; padding: 12px 0; margin-bottom: 0; }
-    #saveStatus {margin-left:8px; font-size:13px;}
-    .search-bar { margin-bottom: 14px; text-align: center; }
+
+    .export-btns button {
+      width: calc(50% - 12px);
+      min-width: 130px;
+      padding: 16px 0;
+      margin-bottom: 0;
+      font-size: 1.1em;
+      background: #0a0f1a;
+    }
+
+    #saveStatus {
+      margin-left: 8px;
+      font-size: 14px;
+      color: #ffb3ff;
+      text-shadow: 0 0 5px #ff00ff;
+      width: 100%;
+      text-align: center;
+    }
+
+    .search-bar {
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
     .search-bar input {
-      padding: 12px; border: 1px solid #ccd; border-radius: 7px;
-      width: 100%; max-width: 340px; font-size: 1.08em; background: #f8fafc;
+      padding: 16px 20px;
+      border: 2px solid #ff00ff;
+      border-radius: 40px;
+      width: 100%;
+      max-width: 100%;
+      font-size: 1.2em;
+      background: #0b0e14;
+      color: #00f0ff;
+      box-shadow: 0 0 15px #ff00ff;
     }
-    .table-container { width: 100%; overflow-x: auto; margin: 0 auto; background: #fff;
-      border-radius: 10px; box-shadow: 0 2px 10px #0002; padding: 0;
+
+    .search-bar input::placeholder {
+      color: #5f5f9f;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin: 0 auto;
+      border-radius: 20px;
+      padding: 4px;
+      background: rgba(10, 15, 25, 0.95);
+    }
+
     table {
-      width: 100%; min-width: 780px; border-radius: 8px; border-collapse: collapse;
-      font-size: 1em; background: #fff;
+      width: 100%;
+      min-width: 680px;
+      border-collapse: collapse;
+      font-size: 1em;
+      background: transparent;
+      border-radius: 16px;
+      overflow: hidden;
     }
-    th, td { padding: 12px 6px; border-bottom: 1px solid #eee; text-align: left; }
+
+    th, td {
+      padding: 16px 8px;
+      border-bottom: 1px solid #3a2f6a;
+      text-align: left;
+      color: #c0c0ff;
+    }
+
     th {
-      background: #f0f6fb; position: sticky; top: 0; z-index: 1; font-size: 1em;
+      background: #1a0f2f;
+      color: #ffb3ff;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.9em;
+      text-shadow: 0 0 5px #ff00ff;
+      border-bottom: 3px solid #ff00ff;
     }
-    .flag { color: #e74c3c; font-weight: bold;}
-    .okay { color: #23c181; font-weight: bold;}
+
+    td {
+      background: rgba(20, 15, 35, 0.8);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .flag {
+      color: #ff5f7f;
+      font-weight: 700;
+      text-shadow: 0 0 10px #ff0000;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; text-shadow: 0 0 5px #ff0000; }
+      50% { opacity: 0.8; text-shadow: 0 0 15px #ff0000; }
+    }
+
+    .okay {
+      color: #5fffaf;
+      font-weight: 700;
+      text-shadow: 0 0 10px #00ff80;
+    }
+
     .del-btn {
-      background: #e74c3c; color: #fff; border: none; border-radius: 5px;
-      padding: 9px 14px; cursor: pointer; font-size: 1em; width: 100%; max-width: 82px;
-      box-shadow: 0 1px 3px #0002; opacity: 1; transition: background 0.18s, opacity .2s;
-      display: inline-block;
+      background: #2a0f1f;
+      color: #ff5f7f;
+      border: 2px solid #ff00a0;
+      border-radius: 30px;
+      padding: 12px 12px;
+      cursor: pointer;
+      font-size: 1em;
+      width: 100%;
+      max-width: 90px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 0 10px #ff00a0;
+      transition: all 0.1s;
+      -webkit-tap-highlight-color: transparent;
     }
-    .del-btn:active, .del-btn:focus { background: #a6231f; }
-    @media (max-width:700px) {
-      form, .table-container { max-width: 100vw; }
-      h1 { font-size: 1.19em;}
-      table { font-size: .96em; min-width: 620px;}
-      .export-btns button { font-size: 1em; min-width: 90px;}
+
+    .del-btn:active {
+      background: #4f1f2f;
+      transform: scale(0.95);
+      box-shadow: 0 0 20px #ff5f7f;
     }
-    @media (max-width:480px) {
-      body { padding: 3px;}
-      .table-container { box-shadow: none;}
-      table { font-size: .95em; min-width: 500px;}
-      th, td { padding: 9px 2px;}
+
+    /* Android friendly touch targets */
+    button, .del-btn, select, input {
+      touch-action: manipulation;
+      min-height: 52px;
+    }
+
+    /* Better scrollbar for Android */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #1a1f2e;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #ff00ff;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:active {
+      background: #00f0ff;
+    }
+
+    /* Cyberpunk grid lines */
+    .table-container::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(255,0,255,0.1) 1px, transparent 1px),
+                  linear-gradient(0deg, rgba(0,255,255,0.1) 1px, transparent 1px);
+      background-size: 20px 20px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Responsive fixes */
+    @media (max-width: 600px) {
+      body { padding: 6px; }
+      h1 { font-size: 1.5em; letter-spacing: 2px; }
+      .export-btns button { font-size: 1em; padding: 14px 0; }
+      th, td { padding: 14px 4px; font-size: 0.9em; }
+      .del-btn { max-width: 70px; padding: 10px 6px; font-size: 0.9em; }
+    }
+
+    @media (max-width: 380px) {
+      table { min-width: 550px; }
+      th, td { padding: 12px 3px; font-size: 0.85em; }
     }
   </style>
 </head>
 <body>
-  <h1>Scale Calibration Checker</h1>
+  <h1>⚡SCALE CAL: CYBERPUNK⚡</h1>
+  
   <form id="scaleForm" autocomplete="off">
-    <label>Scale Model:
-      <select id="scaleModel" required>
-        <option value="">Select Scale</option>
-        <option>DS782</option>
-        <option>SM110</option>
-        <option>MICRO A12E 300KG</option>
-        <option>MICRO A12E 30KG</option>
-        <option>MICRO A12E 600KG</option>
-        <option>PALLET SCALE</option>
-        <option>COIN SCALE</option>
-      </select>
-    </label>
-    <label>Location:
-      <select id="location" required>
-        <option value="">Select Location</option>
-        <optgroup label="Tills" id="tillsGroup"></optgroup>
-        <optgroup label="Departments">
-          <option>BUTCHERY</option>
-          <option>SPICE</option>
-          <option>CHEESE</option>
-          <option>FRUIT AND VEG</option>
-          <option>RECEIVING</option>
-          <option>CASH OFFICE</option>
-          <option>SILVERS</option>
-        </optgroup>
-      </select>
-    </label>
-    <label>Measured Weight (kg): 
-      <input type="number" id="weight" step="0.01" required>
-    </label>
-    <label>Notes (optional): <input type="text" id="notes"></label>
-    <button type="submit">Add Reading</button>
+    <label>🔷 SCALE MODEL</label>
+    <select id="scaleModel" required>
+      <option value="">SELECT MODEL</option>
+      <option>DS782</option>
+      <option>SM110</option>
+      <option>MICRO A12E 300KG</option>
+      <option>MICRO A12E 30KG</option>
+      <option>MICRO A12E 600KG</option>
+      <option>PALLET SCALE</option>
+      <option>COIN SCALE</option>
+    </select>
+
+    <label>📍 LOCATION</label>
+    <select id="location" required>
+      <option value="">SELECT LOCATION</option>
+      <optgroup label="🔴 TILLS" id="tillsGroup"></optgroup>
+      <optgroup label="🔵 DEPARTMENTS">
+        <option>BUTCHERY</option>
+        <option>SPICE</option>
+        <option>CHEESE</option>
+        <option>FRUIT AND VEG</option>
+        <option>RECEIVING</option>
+        <option>CASH OFFICE</option>
+        <option>SILVERS</option>
+      </optgroup>
+    </select>
+
+    <label>⚖️ MEASURED (kg)</label>
+    <input type="number" id="weight" step="0.01" placeholder="0.00" required>
+
+    <label>📝 NOTES (OPTIONAL)</label>
+    <input type="text" id="notes" placeholder="ENTER NOTES...">
+
+    <button type="submit">➕ ADD READING</button>
   </form>
+
   <div class="export-btns">
-    <button onclick="downloadCSV()" type="button">Download CSV</button>
-    <button onclick="downloadPDF()" type="button">Download PDF</button>
+    <button onclick="downloadCSV()" type="button">📥 CSV</button>
+    <button onclick="downloadPDF()" type="button">📥 PDF</button>
     <span id="saveStatus"></span>
   </div>
+
   <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search results...">
+    <input type="text" id="searchInput" placeholder="🔍 SEARCH RESULTS...">
   </div>
+
   <div class="table-container">
     <table id="resultsTable">
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Scale Model</th>
-          <th>Location</th>
-          <th>Measured (kg)</th>
-          <th>Difference</th>
-          <th>Status</th>
-          <th>Notes</th>
-          <th>Delete</th>
+          <th>DATE</th>
+          <th>MODEL</th>
+          <th>LOCATION</th>
+          <th>MEAS.</th>
+          <th>DIFF</th>
+          <th>STATUS</th>
+          <th>NOTES</th>
+          <th>DEL</th>
         </tr>
       </thead>
       <tbody>
@@ -147,6 +422,7 @@
       </tbody>
     </table>
   </div>
+
   <script>
     // ==== BIN ID AND SECRET KEY ====
     const BIN_ID = '686798f38a456b7966bb2a98';
@@ -155,7 +431,7 @@
 
     window.onload = function() {
       let tillOptions = '';
-      for (let i = 1; i <= 80; i++) {
+      for (let i = 1; i <= 83; i++) {
         tillOptions += `<option>TILL ${i}</option>`;
       }
       document.getElementById('tillsGroup').innerHTML = tillOptions;
@@ -191,11 +467,11 @@
           <td>${r.scaleModel}</td>
           <td>${r.location}</td>
           <td>${r.weight.toFixed(2)}</td>
-          <td>${r.diff > 0 ? "+" : ""}${r.diff.toFixed(2)} kg</td>
-          <td class="${r.status === 'OK' ? 'okay' : 'flag'}">${r.status}</td>
-          <td>${r.notes}</td>
+          <td>${r.diff > 0 ? "+" : ""}${r.diff.toFixed(2)}</td>
+          <td class="${r.status === 'OK' ? 'okay' : 'flag'}">${r.status === 'OK' ? '✓ OK' : '⚠️ CAL'}</td>
+          <td>${r.notes || '-'}</td>
           <td>
-            <button class="del-btn" onclick="deleteEntry(${idx}, ${!!filtered})">Delete</button>
+            <button class="del-btn" onclick="deleteEntry(${idx}, ${!!filtered})">✕</button>
           </td>
         </tr>
       `).join('');
@@ -225,46 +501,49 @@
     };
 
     function downloadCSV() {
-      if (!results.length) return alert('No data to download!');
+      if (!results.length) return alert('⚠️ NO DATA TO DOWNLOAD!');
       let csv = 'Date,Scale Model,Location,Measured (kg),Difference,Status,Notes\n';
       csv += results.map(r =>
-        `"${r.date}","${r.scaleModel}","${r.location}",${r.weight.toFixed(2)},"${r.diff > 0 ? "+" : ""}${r.diff.toFixed(2)} kg",${r.status},"${r.notes.replace(/"/g,'""')}"`
+        `"${r.date}","${r.scaleModel}","${r.location}",${r.weight.toFixed(2)},"${r.diff > 0 ? "+" : ""}${r.diff.toFixed(2)}",${r.status},"${r.notes.replace(/"/g,'""')}"`
       ).join('\n');
       const blob = new Blob([csv], {type: 'text/csv'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'scale_calibration.csv';
+      a.download = 'cyber_scale_data.csv';
       a.click();
     }
 
     function downloadPDF() {
-      if (!results.length) return alert('No data to download!');
+      if (!results.length) return alert('⚠️ NO DATA TO DOWNLOAD!');
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      const col = ["Date", "Scale Model", "Location", "Measured (kg)", "Difference", "Status", "Notes"];
+      const col = ["Date", "Model", "Location", "kg", "Diff", "Status", "Notes"];
       const rows = results.map(r => [
-        r.date,
-        r.scaleModel,
-        r.location,
+        r.date.substring(0,10),
+        r.scaleModel.substring(0,12),
+        r.location.substring(0,12),
         r.weight.toFixed(2),
-        (r.diff > 0 ? "+" : "") + r.diff.toFixed(2) + " kg",
-        r.status,
-        r.notes
+        (r.diff > 0 ? "+" : "") + r.diff.toFixed(2),
+        r.status === "OK" ? "OK" : "CAL",
+        r.notes.substring(0,15) || "-"
       ]);
       doc.setFontSize(16);
-      doc.text("Scale Calibration Report", 10, 15);
-      doc.setFontSize(10);
+      doc.setTextColor(0, 240, 255);
+      doc.text("CYBER SCALE REPORT", 10, 15);
+      doc.setFontSize(8);
+      doc.setTextColor(255, 180, 255);
       let startY = 25;
-      const rowHeight = 8;
+      const rowHeight = 6;
       col.forEach((c, i) => {
-        doc.text(c, 10 + i*30, startY);
+        doc.text(c, 10 + i*27, startY);
       });
       rows.forEach((row, rIdx) => {
+        doc.setTextColor(200, 200, 255);
         row.forEach((cell, cIdx) => {
-          doc.text(String(cell), 10 + cIdx*30, startY + rowHeight * (rIdx + 1));
+          doc.text(String(cell), 10 + cIdx*27, startY + rowHeight * (rIdx + 1));
         });
       });
-      doc.save('scale_calibration.pdf');
+      doc.save('cyber_scale_report.pdf');
     }
 
     document.getElementById('searchInput').addEventListener('input', function() {
@@ -283,7 +562,7 @@
     });
 
     async function loadResults() {
-      setStatus('Loading data...');
+      setStatus('🔃 LOADING...');
       try {
         const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
           headers: {
@@ -300,14 +579,14 @@
           results = [];
         }
         renderTable();
-        setStatus('Loaded!');
+        setStatus('✅ LOADED!');
       } catch (err) {
-        setStatus('Failed to load data');
+        setStatus('❌ FAILED');
       }
     }
 
     async function saveResults() {
-      setStatus('Saving...');
+      setStatus('💾 SAVING...');
       try {
         const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
           method: 'PUT',
@@ -318,15 +597,15 @@
           body: JSON.stringify(results)
         });
         if (!res.ok) throw new Error('Failed to save');
-        setStatus('Saved!');
+        setStatus('✅ SAVED!');
       } catch (err) {
-        setStatus('Failed to save');
+        setStatus('❌ SAVE FAIL');
       }
     }
 
     function setStatus(msg) {
       document.getElementById('saveStatus').textContent = msg;
-      if(msg!=="") setTimeout(()=>{document.getElementById('saveStatus').textContent="";},2500);
+      if(msg!=="") setTimeout(()=>{document.getElementById('saveStatus').textContent="";},2000);
     }
 
     renderTable();
