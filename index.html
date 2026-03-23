@@ -2,620 +2,824 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>⚡SCALE CAL: CYBERPUNK⚡</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+  <title>Scale Calibration Pro | Smart Analytics + Department Insights</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <meta name="theme-color" content="#00f0ff"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <meta name="theme-color" content="#1e3a8a">
   <style>
-    /* CYBERPUNK THEME - MOBILE FIRST */
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
+    /* Theme Variables */
+    :root {
+      --bg-primary: #f1f5f9;
+      --bg-secondary: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --border-color: #e2e8f0;
+      --card-bg: #ffffff;
+      --header-bg: #fafcff;
+      --accent: #1e3a8a;
+      --accent-hover: #2563eb;
+      --success: #15803d;
+      --danger: #b91c1c;
+      --warning: #b45309;
+      --table-hover: #fefce8;
+      --status-ok-bg: #dcfce7;
+      --status-cal-bg: #fee2e2;
+    }
+
+    body.dark {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --border-color: #334155;
+      --card-bg: #1e293b;
+      --header-bg: #0f172a;
+      --accent: #3b82f6;
+      --accent-hover: #60a5fa;
+      --table-hover: #334155;
+      --status-ok-bg: #14532d;
+      --status-cal-bg: #7f1a1a;
     }
 
     body {
-      font-family: 'Rajdhani', 'Segoe UI', 'Arial', sans-serif;
-      background: #0a0c0f;
-      background-image: 
-        linear-gradient(45deg, rgba(255, 0, 255, 0.05) 0%, transparent 20%),
-        linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, transparent 20%),
-        radial-gradient(circle at 50% 50%, #1a1f2e 0%, #0b0d14 100%);
-      color: #e0e0ff;
-      padding: 8px;
-      min-height: 100vh;
-      position: relative;
+      background: var(--bg-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 24px 20px;
+      color: var(--text-primary);
+      transition: background 0.3s, color 0.3s;
     }
 
-    /* Glitch effect overlay */
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: repeating-linear-gradient(0deg, rgba(0,255,255,0.02) 0px, rgba(255,0,255,0.02) 2px, transparent 3px, transparent 6px);
-      pointer-events: none;
-      z-index: 9999;
+    .dashboard-container {
+      max-width: 1600px;
+      margin: 0 auto;
     }
 
+    /* Header */
+    .pro-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+      border-bottom: 3px solid var(--accent);
+      padding-bottom: 16px;
+    }
     h1 {
-      color: #00f0ff;
-      font-size: 1.8em;
-      margin: 10px 0 12px 0;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      text-shadow: 
-        0 0 5px #00f0ff,
-        0 0 10px #00f0ff,
-        2px 2px 0 #ff00ff,
-        -2px -2px 0 #00ffff;
+      font-size: 1.85rem;
       font-weight: 700;
-      word-break: break-word;
-      animation: glitch 3s infinite;
+      background: linear-gradient(135deg, var(--accent), #3b82f6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
     }
-
-    @keyframes glitch {
-      0%, 100% { transform: skew(0deg, 0deg); opacity: 1; }
-      95% { transform: skew(0deg, 0deg); opacity: 1; }
-      96% { transform: skew(5deg, 1deg); opacity: 0.8; text-shadow: 3px 0 0 #ff00ff, -3px 0 0 #00ffff; }
-      97% { transform: skew(-5deg, -1deg); opacity: 0.9; text-shadow: -3px 0 0 #ff00ff, 3px 0 0 #00ffff; }
-      98% { transform: skew(0deg, 0deg); opacity: 1; }
-    }
-
-    form, .table-container, .export-btns, .search-bar input {
-      border: 2px solid #00f0ff;
-      box-shadow: 
-        0 0 15px #00f0ff,
-        inset 0 0 10px rgba(0, 240, 255, 0.3),
-        5px 5px 0 #ff00ff;
-      background: #0f1119;
-      backdrop-filter: blur(2px);
-    }
-
-    form {
-      border-radius: 16px;
-      padding: 20px 16px;
-      margin-bottom: 20px;
-      max-width: 100%;
-      margin-left: auto;
-      margin-right: auto;
-      background: rgba(10, 15, 25, 0.95);
-    }
-
-    label {
-      font-weight: 600;
-      display: block;
-      margin-bottom: 6px;
-      color: #ffb3ff;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: 0.9em;
-      text-shadow: 0 0 5px #ff00ff;
-    }
-
-    select, input[type="number"], input[type="text"] {
-      padding: 16px 14px;
-      margin-bottom: 18px;
-      border: 2px solid #4a3f7a;
-      border-radius: 12px;
-      font-size: 1.18em;
-      width: 100%;
-      box-sizing: border-box;
-      background: #0b0e14;
-      color: #00ffff;
-      font-weight: 500;
-      -webkit-appearance: none;
-      appearance: none;
-      transition: all 0.2s;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-    }
-
-    select:focus, input:focus {
-      border-color: #ff00ff;
-      outline: none;
-      box-shadow: 0 0 15px #ff00ff, inset 0 0 10px #000;
-    }
-
-    /* Custom dropdown arrow */
-    select {
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2300f0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-size: 20px;
-    }
-
-    button[type="submit"], .export-btns button {
-      background: #120b29;
-      color: #00f0ff;
-      border: 2px solid #ff00ff;
-      border-radius: 40px;
-      padding: 18px 0;
-      font-size: 1.3em;
-      width: 100%;
-      margin-top: 10px;
-      margin-bottom: 6px;
-      cursor: pointer;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      box-shadow: 
-        0 0 20px #ff00ff,
-        inset 0 0 10px #00f0ff;
-      transition: all 0.15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    button[type="submit"]:active, .export-btns button:active {
-      background: #1f1440;
-      transform: scale(0.98);
-      box-shadow: 0 0 30px #00f0ff, inset 0 0 20px #ff00ff;
-    }
-
-    .export-btns {
+    .header-actions {
       display: flex;
       gap: 12px;
-      margin-bottom: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
-      padding: 16px;
-      border-radius: 50px;
-      background: rgba(10, 15, 25, 0.9);
+      align-items: center;
     }
-
-    .export-btns button {
-      width: calc(50% - 12px);
-      min-width: 130px;
-      padding: 16px 0;
-      margin-bottom: 0;
-      font-size: 1.1em;
-      background: #0a0f1a;
-    }
-
-    #saveStatus {
-      margin-left: 8px;
-      font-size: 14px;
-      color: #ffb3ff;
-      text-shadow: 0 0 5px #ff00ff;
-      width: 100%;
-      text-align: center;
-    }
-
-    .search-bar {
-      margin-bottom: 16px;
-      text-align: center;
-    }
-
-    .search-bar input {
-      padding: 16px 20px;
-      border: 2px solid #ff00ff;
+    .badge {
+      background: var(--bg-secondary);
+      padding: 6px 14px;
       border-radius: 40px;
-      width: 100%;
-      max-width: 100%;
-      font-size: 1.2em;
-      background: #0b0e14;
-      color: #00f0ff;
-      box-shadow: 0 0 15px #ff00ff;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--accent);
+      border: 1px solid var(--border-color);
+    }
+    .theme-toggle {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 40px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: 0.2s;
     }
 
-    .search-bar input::placeholder {
-      color: #5f5f9f;
+    /* Card styling */
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border: 1px solid var(--border-color);
+      margin-bottom: 28px;
+      transition: background 0.3s;
+    }
+    .card-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-color);
+      font-weight: 600;
+      font-size: 1.1rem;
+      background: var(--header-bg);
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .card-body {
+      padding: 24px;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    .stat-label {
+      font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .stat-trend {
+      font-size: 0.7rem;
+      margin-top: 8px;
+      color: var(--text-secondary);
     }
 
-    .table-container {
-      width: 100%;
-      overflow-x: auto;
-      margin: 0 auto;
+    /* Chart Grid - Two columns for dual charts */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+    .chart-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
       border-radius: 20px;
-      padding: 4px;
-      background: rgba(10, 15, 25, 0.95);
+      padding: 20px;
+    }
+    .chart-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    canvas {
+      max-height: 280px;
+      width: 100%;
     }
 
+    /* Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .input-group label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+    select, input {
+      padding: 12px 14px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 14px;
+      font-size: 0.95rem;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      transition: 0.2s;
+      font-family: inherit;
+    }
+    select:focus, input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    }
+    button {
+      background: var(--accent);
+      border: none;
+      padding: 12px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      color: white;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.15s;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    button:active {
+      transform: scale(0.97);
+    }
+    button:hover {
+      background: var(--accent-hover);
+    }
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    .btn-secondary:hover {
+      background: var(--border-color);
+    }
+    .btn-danger {
+      background: var(--danger);
+    }
+
+    /* Table */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 18px;
+    }
     table {
       width: 100%;
-      min-width: 680px;
       border-collapse: collapse;
-      font-size: 1em;
-      background: transparent;
-      border-radius: 16px;
-      overflow: hidden;
+      font-size: 0.85rem;
     }
-
-    th, td {
-      padding: 16px 8px;
-      border-bottom: 1px solid #3a2f6a;
-      text-align: left;
-      color: #c0c0ff;
-    }
-
     th {
-      background: #1a0f2f;
-      color: #ffb3ff;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: 0.9em;
-      text-shadow: 0 0 5px #ff00ff;
-      border-bottom: 3px solid #ff00ff;
+      text-align: left;
+      padding: 14px 12px;
+      background: var(--header-bg);
+      font-weight: 600;
+      color: var(--text-primary);
+      border-bottom: 1.5px solid var(--border-color);
     }
-
     td {
-      background: rgba(20, 15, 35, 0.8);
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-secondary);
     }
-
-    tr:last-child td {
-      border-bottom: none;
+    tr:hover td {
+      background: var(--table-hover);
     }
-
-    .flag {
-      color: #ff5f7f;
-      font-weight: 700;
-      text-shadow: 0 0 10px #ff0000;
-      animation: pulse 1s infinite;
+    .status-ok {
+      background: var(--status-ok-bg);
+      color: #4ade80;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 40px;
+      display: inline-block;
+      font-size: 0.75rem;
     }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; text-shadow: 0 0 5px #ff0000; }
-      50% { opacity: 0.8; text-shadow: 0 0 15px #ff0000; }
+    .status-cal {
+      background: var(--status-cal-bg);
+      color: #f87171;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 40px;
+      display: inline-block;
+      font-size: 0.75rem;
     }
-
-    .okay {
-      color: #5fffaf;
-      font-weight: 700;
-      text-shadow: 0 0 10px #00ff80;
-    }
-
-    .del-btn {
-      background: #2a0f1f;
-      color: #ff5f7f;
-      border: 2px solid #ff00a0;
-      border-radius: 30px;
-      padding: 12px 12px;
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-weight: 600;
       cursor: pointer;
-      font-size: 1em;
-      width: 100%;
-      max-width: 90px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      box-shadow: 0 0 10px #ff00a0;
-      transition: all 0.1s;
-      -webkit-tap-highlight-color: transparent;
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 0.8rem;
     }
-
-    .del-btn:active {
-      background: #4f1f2f;
-      transform: scale(0.95);
-      box-shadow: 0 0 20px #ff5f7f;
+    .delete-btn:hover {
+      background: rgba(239,68,68,0.1);
     }
-
-    /* Android friendly touch targets */
-    button, .del-btn, select, input {
-      touch-action: manipulation;
-      min-height: 52px;
+    .diff-positive { color: #f87171; font-weight: 500; }
+    .diff-negative { color: #4ade80; font-weight: 500; }
+    
+    .toast-notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--accent);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 40px;
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
-
-    /* Better scrollbar for Android */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
     }
-
-    ::-webkit-scrollbar-track {
-      background: #1a1f2e;
+    
+    .filter-chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
     }
-
-    ::-webkit-scrollbar-thumb {
-      background: #ff00ff;
-      border-radius: 10px;
+    .chip {
+      padding: 6px 14px;
+      border-radius: 30px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: 0.2s;
     }
-
-    ::-webkit-scrollbar-thumb:active {
-      background: #00f0ff;
+    .chip.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
     }
-
-    /* Cyberpunk grid lines */
-    .table-container::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, rgba(255,0,255,0.1) 1px, transparent 1px),
-                  linear-gradient(0deg, rgba(0,255,255,0.1) 1px, transparent 1px);
-      background-size: 20px 20px;
-      pointer-events: none;
-      z-index: 0;
+    .chip:hover {
+      transform: translateY(-1px);
     }
-
-    /* Responsive fixes */
-    @media (max-width: 600px) {
-      body { padding: 6px; }
-      h1 { font-size: 1.5em; letter-spacing: 2px; }
-      .export-btns button { font-size: 1em; padding: 14px 0; }
-      th, td { padding: 14px 4px; font-size: 0.9em; }
-      .del-btn { max-width: 70px; padding: 10px 6px; font-size: 0.9em; }
+    
+    .insight-badge {
+      background: linear-gradient(135deg, #f59e0b20, #ef444420);
+      border-left: 4px solid #f59e0b;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
     }
-
-    @media (max-width: 380px) {
-      table { min-width: 550px; }
-      th, td { padding: 12px 3px; font-size: 0.85em; }
+    
+    @media (max-width: 768px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      body { padding: 16px; }
+      .stat-value { font-size: 1.5rem; }
     }
   </style>
 </head>
 <body>
-  <h1>⚡SCALE CAL: CYBERPUNK⚡</h1>
-  
-  <form id="scaleForm" autocomplete="off">
-    <label>🔷 SCALE MODEL</label>
-    <select id="scaleModel" required>
-      <option value="">SELECT MODEL</option>
-      <option>DS782</option>
-      <option>SM110</option>
-      <option>MICRO A12E 300KG</option>
-      <option>MICRO A12E 30KG</option>
-      <option>MICRO A12E 600KG</option>
-      <option>PALLET SCALE</option>
-      <option>COIN SCALE</option>
-    </select>
-
-    <label>📍 LOCATION</label>
-    <select id="location" required>
-      <option value="">SELECT LOCATION</option>
-      <optgroup label="🔴 TILLS" id="tillsGroup"></optgroup>
-      <optgroup label="🔵 DEPARTMENTS">
-        <option>BUTCHERY</option>
-        <option>SPICE</option>
-        <option>CHEESE</option>
-        <option>FRUIT AND VEG</option>
-        <option>RECEIVING</option>
-        <option>CASH OFFICE</option>
-        <option>SILVERS</option>
-      </optgroup>
-    </select>
-
-    <label>⚖️ MEASURED (kg)</label>
-    <input type="number" id="weight" step="0.01" placeholder="0.00" required>
-
-    <label>📝 NOTES (OPTIONAL)</label>
-    <input type="text" id="notes" placeholder="ENTER NOTES...">
-
-    <button type="submit">➕ ADD READING</button>
-  </form>
-
-  <div class="export-btns">
-    <button onclick="downloadCSV()" type="button">📥 CSV</button>
-    <button onclick="downloadPDF()" type="button">📥 PDF</button>
-    <span id="saveStatus"></span>
+<div class="dashboard-container">
+  <div class="pro-header">
+    <h1>⚖️ Scale Calibration Pro · Department Analytics</h1>
+    <div class="header-actions">
+      <div class="badge" id="liveClock"></div>
+      <button class="theme-toggle" id="darkModeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
   </div>
 
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="🔍 SEARCH RESULTS...">
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">📊 Total Readings</div><div class="stat-value" id="totalCount">0</div><div class="stat-trend" id="totalTrend">—</div></div>
+    <div class="stat-card"><div class="stat-label">⚠️ Needs Calibration</div><div class="stat-value" id="needsCalCount">0</div><div class="stat-trend" id="calibrationRate">0% fail rate</div></div>
+    <div class="stat-card"><div class="stat-label">✅ Compliance Rate</div><div class="stat-value" id="complianceRate">100%</div><div class="stat-trend">within ±0.05kg</div></div>
+    <div class="stat-card"><div class="stat-label">📈 Avg Deviation</div><div class="stat-value" id="avgDiff">0.000</div><div class="stat-trend" id="deviationTrend">stable</div></div>
+    <div class="stat-card"><div class="stat-label">🎯 Worst Dept (Deviation)</div><div class="stat-value" id="worstDept">—</div><div class="stat-trend" id="worstDeptVal">0.000 kg avg</div></div>
+    <div class="stat-card"><div class="stat-label">🏭 Active Locations</div><div class="stat-value" id="activeLocations">0</div><div class="stat-trend">unique areas</div></div>
   </div>
 
-  <div class="table-container">
-    <table id="resultsTable">
-      <thead>
-        <tr>
-          <th>DATE</th>
-          <th>MODEL</th>
-          <th>LOCATION</th>
-          <th>MEAS.</th>
-          <th>DIFF</th>
-          <th>STATUS</th>
-          <th>NOTES</th>
-          <th>DEL</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- results here -->
-      </tbody>
-    </table>
+  <!-- Insight Panel -->
+  <div class="insight-badge" id="insightPanel">
+    💡 <strong>Department Insight:</strong> Analyzing department performance...
   </div>
 
-  <script>
-    // ==== BIN ID AND SECRET KEY ====
-    const BIN_ID = '686798f38a456b7966bb2a98';
-    const SECRET_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
-    // ===============================
+  <!-- Dual Charts Section -->
+  <div class="charts-grid">
+    <div class="chart-container">
+      <div class="chart-title">
+        📉 <span>Deviation Trend (Last 20 Readings)</span>
+      </div>
+      <canvas id="trendChart"></canvas>
+    </div>
+    <div class="chart-container">
+      <div class="chart-title">
+        🏭 <span>Departments Most Out of Spec | Average |Deviation|</span>
+      </div>
+      <canvas id="deptChart"></canvas>
+    </div>
+  </div>
 
-    window.onload = function() {
-      let tillOptions = '';
-      for (let i = 1; i <= 83; i++) {
-        tillOptions += `<option>TILL ${i}</option>`;
-      }
-      document.getElementById('tillsGroup').innerHTML = tillOptions;
-      loadResults();
-    }
+  <!-- Input Card -->
+  <div class="card">
+    <div class="card-header">
+      <span>📝 New Calibration Entry</span>
+      <span style="font-size:0.7rem; margin-left:auto;">Reference: 5.00 kg | Tolerance: ±0.05 kg</span>
+    </div>
+    <div class="card-body">
+      <form id="scaleForm" autocomplete="off">
+        <div class="form-grid">
+          <div class="input-group">
+            <label>🔧 Scale Model</label>
+            <select id="scaleModel" required>
+              <option value="">Select model</option>
+              <option>DS782</option><option>SM110</option><option>MICRO A12E 300KG</option>
+              <option>MICRO A12E 30KG</option><option>MICRO A12E 600KG</option>
+              <option>PALLET SCALE</option><option>COIN SCALE</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>📍 Location / Department</label>
+            <select id="location" required>
+              <option value="">Select location</option>
+              <optgroup label="TILLS" id="tillsGroup"></optgroup>
+              <optgroup label="DEPARTMENTS">
+                <option>BUTCHERY</option><option>SPICE</option><option>CHEESE</option>
+                <option>FRUIT AND VEG</option><option>RECEIVING</option>
+                <option>CASH OFFICE</option><option>SILVERS</option><option>BAKERY</option>
+                <option>DELI</option><option>SEAFOOD</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>⚖️ Measured (kg)</label>
+            <input type="number" id="weight" step="0.01" placeholder="e.g., 5.03" required>
+          </div>
+          <div class="input-group">
+            <label>📋 Technician / Notes</label>
+            <input type="text" id="notes" placeholder="Technician ID or remarks">
+          </div>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end;">
+          <button type="submit">➕ Add Reading</button>
+          <button type="button" id="quickAddSampleBtn" class="btn-secondary">📊 Add Sample Data</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-    const tolerance = 0.05;
-    let results = [];
-    let filteredResults = null;
+  <!-- Filter & Export -->
+  <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div class="filter-chips">
+      <div class="chip active" data-filter="all">All Records</div>
+      <div class="chip" data-filter="ok">✅ OK Only</div>
+      <div class="chip" data-filter="cal">⚠️ Needs Calibration</div>
+      <div class="chip" data-filter="today">📅 Today</div>
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <input type="text" id="searchInput" placeholder="🔍 Search..." style="padding: 10px 16px; min-width: 180px;">
+      <button onclick="exportCSV()" class="btn-secondary">📎 CSV</button>
+      <button onclick="exportPDF()" class="btn-secondary">📄 PDF</button>
+      <button id="clearAllBtn" class="btn-danger" style="background:transparent; color:var(--danger); border:1px solid var(--danger);">🗑️ Clear All</button>
+    </div>
+  </div>
 
-    document.getElementById('scaleForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const scaleModel = document.getElementById('scaleModel').value;
-      const location = document.getElementById('location').value;
-      const weight = parseFloat(document.getElementById('weight').value);
-      const notes = document.getElementById('notes').value.trim();
-      const diff = +(weight - 5).toFixed(2);
-      const status = Math.abs(diff) <= tolerance ? "OK" : "NEEDS CALIBRATION";
-      const date = new Date().toLocaleString();
-      results.push({ date, scaleModel, location, weight, diff, status, notes });
-      renderTable();
-      saveResults();
-      this.reset();
-      document.getElementById('scaleModel').focus();
-    });
+  <!-- Data Table -->
+  <div class="card">
+    <div class="card-header">
+      <span>📋 Calibration Audit Trail</span>
+      <span style="margin-left: auto; font-size:0.7rem;" id="recordCount"></span>
+    </div>
+    <div class="card-body" style="padding: 0 0 4px 0;">
+      <div class="table-wrapper">
+        <table id="resultsTable">
+          <thead><tr><th>Date & Time</th><th>Model</th><th>Location</th><th>Measured</th><th>Diff</th><th>Status</th><th>Notes</th><th>Action</th></tr></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
-    function renderTable(filtered = null) {
-      const data = filtered || results;
-      const tbody = document.querySelector('#resultsTable tbody');
-      tbody.innerHTML = data.map((r, idx) => `
-        <tr>
-          <td>${r.date}</td>
-          <td>${r.scaleModel}</td>
-          <td>${r.location}</td>
-          <td>${r.weight.toFixed(2)}</td>
-          <td>${r.diff > 0 ? "+" : ""}${r.diff.toFixed(2)}</td>
-          <td class="${r.status === 'OK' ? 'okay' : 'flag'}">${r.status === 'OK' ? '✓ OK' : '⚠️ CAL'}</td>
-          <td>${r.notes || '-'}</td>
-          <td>
-            <button class="del-btn" onclick="deleteEntry(${idx}, ${!!filtered})">✕</button>
-          </td>
-        </tr>
-      `).join('');
-    }
+<script>
+  // CONFIGURATION
+  const BIN_ID = '686798f38a456b7966bb2a98';
+  const SECRET_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
+  const TOLERANCE = 0.05;
+  let readings = [];
+  let currentFilter = 'all';
+  let currentSearch = '';
+  let trendChart = null;
+  let deptChart = null;
 
-    window.deleteEntry = function(idx, isFiltered) {
-      let data = filteredResults || results;
-      if (isFiltered) {
-        const row = data[idx];
-        const mainIdx = results.findIndex(
-          r => r.date === row.date &&
-               r.scaleModel === row.scaleModel &&
-               r.location === row.location &&
-               r.weight === row.weight &&
-               r.diff === row.diff &&
-               r.status === row.status &&
-               r.notes === row.notes
-        );
-        if (mainIdx > -1) results.splice(mainIdx, 1);
-        data.splice(idx, 1);
-        renderTable(data);
-      } else {
-        results.splice(idx, 1);
-        renderTable();
-      }
-      saveResults();
-    };
+  function showToast(msg, isError = false) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.textContent = msg;
+    if (isError) toast.style.background = '#b91c1c';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2500);
+  }
 
-    function downloadCSV() {
-      if (!results.length) return alert('⚠️ NO DATA TO DOWNLOAD!');
-      let csv = 'Date,Scale Model,Location,Measured (kg),Difference,Status,Notes\n';
-      csv += results.map(r =>
-        `"${r.date}","${r.scaleModel}","${r.location}",${r.weight.toFixed(2)},"${r.diff > 0 ? "+" : ""}${r.diff.toFixed(2)}",${r.status},"${r.notes.replace(/"/g,'""')}"`
-      ).join('\n');
-      const blob = new Blob([csv], {type: 'text/csv'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'cyber_scale_data.csv';
-      a.click();
-    }
-
-    function downloadPDF() {
-      if (!results.length) return alert('⚠️ NO DATA TO DOWNLOAD!');
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const col = ["Date", "Model", "Location", "kg", "Diff", "Status", "Notes"];
-      const rows = results.map(r => [
-        r.date.substring(0,10),
-        r.scaleModel.substring(0,12),
-        r.location.substring(0,12),
-        r.weight.toFixed(2),
-        (r.diff > 0 ? "+" : "") + r.diff.toFixed(2),
-        r.status === "OK" ? "OK" : "CAL",
-        r.notes.substring(0,15) || "-"
-      ]);
-      doc.setFontSize(16);
-      doc.setTextColor(0, 240, 255);
-      doc.text("CYBER SCALE REPORT", 10, 15);
-      doc.setFontSize(8);
-      doc.setTextColor(255, 180, 255);
-      let startY = 25;
-      const rowHeight = 6;
-      col.forEach((c, i) => {
-        doc.text(c, 10 + i*27, startY);
+  async function saveToCloud() {
+    try {
+      const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Master-Key': SECRET_KEY },
+        body: JSON.stringify(readings)
       });
-      rows.forEach((row, rIdx) => {
-        doc.setTextColor(200, 200, 255);
-        row.forEach((cell, cIdx) => {
-          doc.text(String(cell), 10 + cIdx*27, startY + rowHeight * (rIdx + 1));
-        });
+      if (res.ok) showToast('💾 Synced');
+    } catch (err) { console.warn('Cloud save failed'); }
+  }
+
+  async function loadData() {
+    try {
+      const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+        headers: { 'X-Master-Key': SECRET_KEY }
       });
-      doc.save('cyber_scale_report.pdf');
-    }
-
-    document.getElementById('searchInput').addEventListener('input', function() {
-      const value = this.value.trim().toLowerCase();
-      if (!value) {
-        filteredResults = null;
-        renderTable();
-        return;
-      }
-      filteredResults = results.filter(r =>
-        Object.values(r).some(val =>
-          String(val).toLowerCase().includes(value)
-        )
-      );
-      renderTable(filteredResults);
-    });
-
-    async function loadResults() {
-      setStatus('🔃 LOADING...');
-      try {
-        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-          headers: {
-            'X-Master-Key': SECRET_KEY
-          }
-        });
-        if (!res.ok) throw new Error('Error loading data');
+      if (res.ok) {
         const data = await res.json();
-        if (data.record && Array.isArray(data.record)) {
-          results = data.record;
-        } else if (data.record && Array.isArray(data.record.results)) {
-          results = data.record.results;
-        } else {
-          results = [];
+        if (data.record && Array.isArray(data.record)) readings = data.record;
+        else readings = [];
+      }
+    } catch (err) { readings = []; }
+    renderAll();
+  }
+
+  // Department analytics: compute average absolute deviation per department
+  function getDepartmentDeviationStats() {
+    const deptMap = new Map(); // key: location, value: { sumAbsDev, count, sumDev }
+    readings.forEach(r => {
+      const dept = r.location;
+      if (!dept) return;
+      const absDev = Math.abs(r.diff);
+      if (!deptMap.has(dept)) deptMap.set(dept, { sumAbsDev: 0, count: 0, sumDev: 0 });
+      const stat = deptMap.get(dept);
+      stat.sumAbsDev += absDev;
+      stat.sumDev += r.diff;
+      stat.count += 1;
+      deptMap.set(dept, stat);
+    });
+    const deptStats = [];
+    for (let [dept, stat] of deptMap.entries()) {
+      deptStats.push({
+        name: dept,
+        avgAbsDev: stat.sumAbsDev / stat.count,
+        avgDev: stat.sumDev / stat.count,
+        count: stat.count,
+        failCount: readings.filter(r => r.location === dept && r.status === 'NEEDS CALIBRATION').length
+      });
+    }
+    deptStats.sort((a, b) => b.avgAbsDev - a.avgAbsDev);
+    return deptStats;
+  }
+
+  function updateDepartmentInsights() {
+    const deptStats = getDepartmentDeviationStats();
+    if (deptStats.length === 0) {
+      document.getElementById('insightPanel').innerHTML = '💡 <strong>Department Insight:</strong> Add readings to see which departments need attention.';
+      document.getElementById('worstDept').innerText = '—';
+      document.getElementById('worstDeptVal').innerText = '0.000 kg avg';
+      return;
+    }
+    const worst = deptStats[0];
+    document.getElementById('worstDept').innerText = worst.name;
+    document.getElementById('worstDeptVal').innerHTML = `${worst.avgAbsDev.toFixed(3)} kg avg | ${worst.failCount} fails`;
+    
+    // Find top 3 problematic departments for insight message
+    const top3 = deptStats.slice(0, 3).map(d => `${d.name} (${d.avgAbsDev.toFixed(3)}kg)`).join(', ');
+    const insightMsg = `⚠️ Most out-of-spec: ${worst.name} with average deviation of ${worst.avgAbsDev.toFixed(3)}kg. Top 3: ${top3 || 'N/A'}. Consider prioritizing calibration for these areas.`;
+    document.getElementById('insightPanel').innerHTML = `💡 <strong>Department Insight:</strong> ${insightMsg}`;
+  }
+
+  function updateDepartmentChart() {
+    const deptStats = getDepartmentDeviationStats();
+    const topDepts = deptStats.slice(0, 8); // top 8 departments with highest avg absolute deviation
+    const labels = topDepts.map(d => d.name.length > 15 ? d.name.slice(0,12)+'...' : d.name);
+    const avgAbsData = topDepts.map(d => d.avgAbsDev);
+    
+    if (deptChart) deptChart.destroy();
+    const ctx = document.getElementById('deptChart').getContext('2d');
+    deptChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Average Absolute Deviation (kg)',
+          data: avgAbsData,
+          backgroundColor: 'rgba(239, 68, 68, 0.7)',
+          borderColor: '#ef4444',
+          borderWidth: 1,
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: { callbacks: { label: (ctx) => `${ctx.raw.toFixed(3)} kg deviation from 5kg` } }
+        },
+        scales: {
+          y: { title: { display: true, text: '|Deviation| (kg)', color: '#64748b' }, beginAtZero: true }
         }
-        renderTable();
-        setStatus('✅ LOADED!');
-      } catch (err) {
-        setStatus('❌ FAILED');
       }
-    }
+    });
+  }
 
-    async function saveResults() {
-      setStatus('💾 SAVING...');
-      try {
-        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Master-Key': SECRET_KEY
-          },
-          body: JSON.stringify(results)
-        });
-        if (!res.ok) throw new Error('Failed to save');
-        setStatus('✅ SAVED!');
-      } catch (err) {
-        setStatus('❌ SAVE FAIL');
-      }
+  function getFilteredReadings() {
+    let filtered = [...readings];
+    if (currentFilter === 'ok') filtered = filtered.filter(r => r.status === 'OK');
+    else if (currentFilter === 'cal') filtered = filtered.filter(r => r.status === 'NEEDS CALIBRATION');
+    else if (currentFilter === 'today') {
+      const today = new Date().toLocaleDateString();
+      filtered = filtered.filter(r => new Date(r.date).toLocaleDateString() === today);
     }
-
-    function setStatus(msg) {
-      document.getElementById('saveStatus').textContent = msg;
-      if(msg!=="") setTimeout(()=>{document.getElementById('saveStatus').textContent="";},2000);
+    if (currentSearch) {
+      const term = currentSearch.toLowerCase();
+      filtered = filtered.filter(r => 
+        r.scaleModel.toLowerCase().includes(term) ||
+        r.location.toLowerCase().includes(term) ||
+        r.status.toLowerCase().includes(term) ||
+        r.notes.toLowerCase().includes(term) ||
+        r.weight.toString().includes(term)
+      );
     }
+    return filtered;
+  }
 
-    renderTable();
+  function updateStats(filtered) {
+    const total = readings.length;
+    const needsCal = readings.filter(r => r.status === 'NEEDS CALIBRATION').length;
+    const okCount = total - needsCal;
+    const complianceRate = total ? ((okCount / total) * 100).toFixed(1) : 100;
+    const avg = total ? (readings.reduce((s, r) => s + r.diff, 0) / total).toFixed(3) : 0;
+    const todayCount = readings.filter(r => new Date(r.date).toLocaleDateString() === new Date().toLocaleDateString()).length;
+    const uniqueLocs = new Set(readings.map(r => r.location)).size;
+    
+    document.getElementById('totalCount').innerText = total;
+    document.getElementById('needsCalCount').innerText = needsCal;
+    document.getElementById('complianceRate').innerHTML = complianceRate + '%';
+    document.getElementById('avgDiff').innerHTML = (avg >= 0 ? '+' : '') + avg;
+    document.getElementById('totalTrend').innerHTML = `📅 Today: ${todayCount} new`;
+    document.getElementById('calibrationRate').innerHTML = total ? `${((needsCal/total)*100).toFixed(1)}% fail rate` : '0%';
+    document.getElementById('deviationTrend').innerHTML = Math.abs(parseFloat(avg)) < 0.02 ? '✓ within spec' : '⚠️ above threshold';
+    document.getElementById('activeLocations').innerText = uniqueLocs;
+    document.getElementById('recordCount').innerHTML = `📌 ${filtered.length} / ${total} records`;
+    
+    updateDepartmentInsights();
+    updateDepartmentChart();
+  }
 
-    // PWA Install (Service Worker)
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-      .then(() => { /* success */ })
-      .catch(() => { /* fail silently */ });
+  function updateTrendChart() {
+    const last20 = readings.slice(0, 20).reverse();
+    const labels = last20.map(r => new Date(r.date).toLocaleTimeString().slice(0,5));
+    const diffs = last20.map(r => r.diff);
+    if (trendChart) trendChart.destroy();
+    const ctx = document.getElementById('trendChart').getContext('2d');
+    trendChart = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets: [{ label: 'Deviation (kg)', data: diffs, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', tension: 0.3, fill: true }] },
+      options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } }, scales: { y: { title: { display: true, text: 'Difference from 5kg' }, grid: { color: 'rgba(100,116,139,0.2)' } } } }
+    });
+  }
+
+  function renderTable() {
+    const filtered = getFilteredReadings();
+    updateStats(filtered);
+    const tbody = document.getElementById('tableBody');
+    if (!filtered.length) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:40px;">📭 No records found. Add your first calibration reading.</td></tr>`;
+      return;
     }
-  </script>
+    tbody.innerHTML = filtered.map(entry => {
+      const diffClass = entry.diff > 0 ? 'diff-positive' : (entry.diff < 0 ? 'diff-negative' : '');
+      const diffSymbol = entry.diff > 0 ? `+${entry.diff.toFixed(3)}` : entry.diff.toFixed(3);
+      return `<tr>
+        <td style="white-space:nowrap;">${escapeHtml(entry.date)}</td>
+        <td>${escapeHtml(entry.scaleModel)}</td>
+        <td>${escapeHtml(entry.location)}</td>
+        <td>${entry.weight.toFixed(3)} kg</td>
+        <td class="${diffClass}">${diffSymbol}</td>
+        <td><span class="${entry.status === 'OK' ? 'status-ok' : 'status-cal'}">${entry.status === 'OK' ? '✓ OK' : '⚠️ CALIBRATE'}</span></td>
+        <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(entry.notes) || '—'}</td>
+        <td><button class="delete-btn" data-id="${entry.id}">✕ Delete</button></td>
+      </tr>`;
+    }).join('');
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = Number(btn.getAttribute('data-id'));
+        readings = readings.filter(r => r.id !== id);
+        renderAll();
+        saveToCloud();
+        showToast('Entry deleted');
+      });
+    });
+    updateTrendChart();
+  }
+
+  function renderAll() { renderTable(); }
+
+  function addReading(model, location, weightVal, notesVal) {
+    const weight = parseFloat(weightVal);
+    if (isNaN(weight)) throw new Error('Invalid weight');
+    const diff = +(weight - 5.00).toFixed(3);
+    const status = Math.abs(diff) <= TOLERANCE ? 'OK' : 'NEEDS CALIBRATION';
+    const newEntry = { id: Date.now() + Math.random() * 10000, date: new Date().toLocaleString(), scaleModel: model, location, weight, diff, status, notes: notesVal.trim() || '' };
+    readings.unshift(newEntry);
+    renderAll();
+    saveToCloud();
+    showToast(`✅ Added: ${model} @ ${location} - ${status}`);
+  }
+
+  function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m) { if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+  function exportCSV() {
+    if (!readings.length) { showToast('No data', true); return; }
+    const headers = ['Date','Scale Model','Location','Measured (kg)','Difference','Status','Notes'];
+    const rows = readings.map(r => [r.date, r.scaleModel, r.location, r.weight.toFixed(3), r.diff.toFixed(3), r.status, r.notes]);
+    let csv = headers.map(h => `"${h}"`).join(',') + '\n' + rows.map(row => row.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob(["\uFEFF" + csv], {type: 'text/csv'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'calibration_export.csv'; a.click(); URL.revokeObjectURL(a.href);
+    showToast('CSV exported');
+  }
+
+  function exportPDF() {
+    if (!readings.length) { showToast('No data', true); return; }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape' });
+    doc.setFillColor(30,58,138); doc.rect(0,0,297,20,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(16); doc.text('Scale Calibration Report', 14, 14);
+    doc.setTextColor(100,116,139); doc.setFontSize(8); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28);
+    const cols = ['Date','Model','Location','kg','Diff','Status','Notes'];
+    const rowsData = readings.slice(0,40).map(r => [r.date.substring(0,16), r.scaleModel.substring(0,12), r.location.substring(0,12), r.weight.toFixed(2), (r.diff>0?'+':'')+r.diff.toFixed(2), r.status==='OK'?'OK':'CAL', (r.notes||'-').substring(0,18)]);
+    if (doc.autoTable) {
+      doc.autoTable({ head: [cols], body: rowsData, startY: 32, theme: 'striped', styles: { fontSize: 7 }, headStyles: { fillColor: [59,130,246] } });
+    } else { let y=36; cols.forEach((c,i)=>doc.text(c,14+i*36,y)); y+=6; rowsData.forEach(r=>{r.forEach((c,i)=>doc.text(String(c),14+i*36,y)); y+=5;}); }
+    doc.save('calibration_report.pdf');
+    showToast('PDF exported');
+  }
+
+  function addSampleData() {
+    const samples = [
+      ['DS782', 'BUTCHERY', 5.02, 'Tech A'], ['SM110', 'SPICE', 4.96, 'Routine'], ['MICRO A12E 30KG', 'CHEESE', 5.09, 'Out of spec'],
+      ['PALLET SCALE', 'FRUIT AND VEG', 5.00, 'Perfect'], ['COIN SCALE', 'CASH OFFICE', 5.12, 'Needs adj'], ['DS782', 'DELI', 4.97, 'OK'],
+      ['SM110', 'BUTCHERY', 5.15, 'Critical'], ['MICRO A12E 300KG', 'SEAFOOD', 4.92, 'Check'], ['PALLET SCALE', 'RECEIVING', 5.07, 'Slight drift'],
+      ['DS782', 'BAKERY', 5.03, 'Stable'], ['COIN SCALE', 'SILVERS', 5.11, 'Recalibrate'], ['MICRO A12E 30KG', 'SPICE', 4.94, 'Low reading']
+    ];
+    samples.forEach(s => addReading(s[0], s[1], s[2], s[3]));
+    showToast('12 sample entries added with department variety');
+  }
+
+  // Event Listeners
+  document.getElementById('scaleForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const model = document.getElementById('scaleModel').value;
+    const loc = document.getElementById('location').value;
+    const weight = document.getElementById('weight').value;
+    const notes = document.getElementById('notes').value;
+    if (!model || !loc || !weight) { showToast('Please fill all required fields', true); return; }
+    addReading(model, loc, parseFloat(weight), notes);
+    document.getElementById('weight').value = '';
+    document.getElementById('notes').value = '';
+  });
+
+  document.getElementById('quickAddSampleBtn').addEventListener('click', addSampleData);
+  document.getElementById('clearAllBtn').addEventListener('click', () => {
+    if (confirm('⚠️ Delete ALL calibration records? This is permanent.')) { readings = []; renderAll(); saveToCloud(); showToast('All data cleared'); }
+  });
+  document.getElementById('searchInput').addEventListener('input', (e) => { currentSearch = e.target.value; renderTable(); });
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      currentFilter = chip.dataset.filter;
+      renderTable();
+    });
+  });
+
+  // Dark Mode
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  if (localStorage.getItem('darkMode') === 'enabled') document.body.classList.add('dark');
+  darkModeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    localStorage.setItem('darkMode', document.body.classList.contains('dark') ? 'enabled' : 'disabled');
+    darkModeToggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+    // Refresh charts to adapt colors
+    updateTrendChart();
+    updateDepartmentChart();
+  });
+  darkModeToggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+
+  // Live Clock
+  function updateClock() { document.getElementById('liveClock').innerText = new Date().toLocaleTimeString(); }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // Tills
+  let tillOptions = '';
+  for (let i = 1; i <= 83; i++) tillOptions += `<option>TILL ${i}</option>`;
+  document.getElementById('tillsGroup').innerHTML = tillOptions;
+
+  loadData();
+</script>
 </body>
 </html>
